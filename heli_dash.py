@@ -134,7 +134,7 @@ stats = get_stats(data)
 #
 #
 
-st.title("Hello Pegaso Dashboard")
+st.title("Hello Pegasus Dashboard")
 st.subheader("Estadísticas generales")
 col1, col2= st.columns(2)
 
