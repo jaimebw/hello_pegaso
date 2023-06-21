@@ -67,19 +67,19 @@ def get_stats(data):
     """
     regis_vals = data.dropna().count().values[0]
     last_update=pd.to_datetime(data.timestamp.values[-1]).strftime('%d/%m/%Y %H:%M') 
+    first_update=pd.to_datetime(data.timestamp.values[0]).strftime('%d/%m/%Y %H:%M') 
     n_helicopters = data.dropna().registration.nunique()
     unique_helicopters = data.dropna().registration.unique().tolist()
     n_days = data.dropna().date.nunique()
-    last_day_activity = data.dropna().date.values[-1]
 
 
     return {
             "regis_vals":regis_vals,
             "last_update": last_update,
+            "first_update": first_update,
             "n_helicopters":n_helicopters,
             "unique_helicopters":unique_helicopters,
             "n_days":n_days,# registered days with activity
-            "last_day_activity":last_day_activity
             }
 
 def h3_heatmap(data,geojson_dict):
@@ -134,26 +134,29 @@ stats = get_stats(data)
 #
 #
 
-st.title("Pegaso helicopter stats dashboard")
-st.subheader("General stats")
+st.title("Hello Pegaso Dashboard")
+st.subheader("Estadísticas generales")
 col1, col2= st.columns(2)
 
 with col1:
-    st.metric("Number of samples", stats["regis_vals"])
-    st.markdown("Registered helicopters")
+    st.metric("Número de muestras", stats["regis_vals"])
+    st.markdown("Aeronaves registradas")
     for heli in stats["unique_helicopters"]:
         st.write(heli)
 with col2:
-    st.metric("Last updated", stats["last_update"])
+    st.metric("Primer registro de actividad",stats["first_update"])
+    st.metric("Última actualización", stats["last_update"])
 
-st.subheader("Heatmap")
-st.markdown("The heatmap shows the number of time a helicopter has been registered in that cell")
+st.subheader("Mapa de calor")
+st.markdown("El mapa de calor muestra cuantas veces se ha registrado un helicoptero por una zona,\
+        . Cuanto más oscuro sea el color, más veces se ha registrado un helicoptero en esa zona.")
 st.plotly_chart(h3_heatmap(agg_data,geodict))
 av_dates = data.dropna().date.unique().tolist()
-st.subheader("Helicopter routes")
-date = st.date_input("Select the day you want to visualize",
+st.subheader("Rutas del helicoptero")
+st.markdown("Hay algunos días en los que no hay ningun registro de actividad.")
+date = st.date_input("Elige el día para visualizar la ruta",
                      min_value = av_dates[0],
                      max_value = av_dates[-1],
-                     value=av_dates[-1])
+                     value=av_dates[0])
 date = datetime.strptime(str(date),"%Y-%m-%d")
 st.plotly_chart(trajectory_map(data,date))
